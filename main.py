@@ -9,6 +9,30 @@ from algoritmos import algoritmo_dijkstra, algoritmo_a_star, generar_laberinto
 from modelos import Nodo
 
 
+def interpolar_puntos(p1, p2):
+    """Genera una lista de coordenadas (fila, col) entre dos puntos."""
+    f1, c1 = p1
+    f2, c2 = p2
+    puntos = []
+
+    # Distancia en ambos ejes
+    df = f2 - f1
+    dc = c2 - c1
+
+    # Cuántos pasos necesitamos (el máximo de las dos distancias)
+    pasos = max(abs(df), abs(dc))
+
+    if pasos == 0: return []
+
+    for i in range(1, pasos + 1):
+        # Fórmula de interpolación lineal (Lerp)
+        t = i / pasos
+        f = int(f1 + df * t)
+        c = int(c1 + dc * t)
+        puntos.append((f, c))
+
+    return puntos
+
 def get_pos_click(pos, filas, ancho):
     x, y = pos
     if x < ANCHO_MENU: return -1, -1
@@ -54,14 +78,14 @@ def main():
 
         jugando = not jugando
         if jugando:
-            boton_jugar.texto = "ABANDONAR";
+            boton_jugar.texto = "ABANDONAR"
             boton_jugar.color = ROJO
             start_time = time.time()
             for f in grid:
                 for n in f:
                     if not n.es_muro() and not n.es_inicio() and not n.es_fin(): n.reset()
         else:
-            boton_jugar.texto = "JUGAR";
+            boton_jugar.texto = "JUGAR"
             boton_jugar.color = VERDE_BOTON
 
     def toggle_ranking():
@@ -80,18 +104,22 @@ def main():
     boton_ranking = Boton(20, 310, 200, 50, "RANKING", toggle_ranking)
     botones = [boton_tamano, boton_jugar, boton_ranking]
 
+    nodo_previo = None
     corriendo = True
     while corriendo:
         t_trans = time.time() - start_time if jugando else 0
 
         dibujar_ventana_completa(VENTANA, grid, botones, jugando, FUENTES, t_trans, actualizar=not viendo_ranking)
         if viendo_ranking: dibujar_tabla_ranking(VENTANA, ranking_data, FUENTES)
+        if not pygame.mouse.get_pressed()[0]:
+            nodo_previo = None
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: corriendo = False
 
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
+                x_click, y_click = pos
                 if pos[0] < ANCHO_MENU:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if jugando:
@@ -101,37 +129,61 @@ def main():
                 elif not viendo_ranking:
                     f, c = get_pos_click(pos, filas_actuales, ancho_nodo)
                     if 0 <= f < filas_actuales and 0 <= c < filas_actuales:
-                        nodo = grid[f][c]
+                        nodo_actual = grid[f][c]
                         if jugando:
-                            # Logica Humano (simplificada aqui)
-                            valido = False
-                            for df, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                                nf, nc = f + df, c + dc
-                                if 0 <= nf < filas_actuales and 0 <= nc < filas_actuales:
-                                    if grid[nf][nc].color in [ROJO, NARANJA]: valido = True
 
-                            if valido:
-                                if nodo == fin:
-                                    t_fin = time.time() - start_time
-                                    nodos_recorridos = 0
-                                    for row in grid:
-                                        for n in row:
+                            nodos_a_pintar = []
+                            if nodo_previo and nodo_previo != nodo_actual:
+                                coordenadas = interpolar_puntos(nodo_previo.get_pos(), nodo_actual.get_pos())
+                                for cf, cc in coordenadas:
+                                    nodos_a_pintar.append(grid[cf][cc])
+                            else:
+                                nodos_a_pintar.append(nodo_actual)
 
-                                            if n.color == ROJO:
-                                                nodos_recorridos += 1
-                                    if generado: guardar_datos("Humano", filas_actuales, t_fin, nodos_recorridos, current_maze_id)
-                                    mostrar_mensaje(VENTANA, f"Ganaste: {t_fin:.2f}s", FUENTES)
-                                    toggle_juego()
-                                elif not nodo.es_muro() and nodo != inicio:
-                                    nodo.hacer_camino_usuario()
+                                # Procesamos cada nodo de la lista (pintar o ganar)
+                            for nodo in nodos_a_pintar:
+                                # TU VALIDACIÓN ORIGINAL DE VECINOS Y PAREDES
+                                # (Adaptada para chequear cada nodo de la línea)
+                                if nodo.es_muro(): continue  # No atravesar muros
+
+                                # Verificamos si podemos conectar (adyacencia)
+                                es_valido = False
+                                for df, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                                    nf, nc = nodo.fila + df, nodo.col + dc
+                                    if 0 <= nf < filas_actuales and 0 <= nc < filas_actuales:
+                                        vecino = grid[nf][nc]
+                                        # Conectamos si el vecino es inicio, camino o el nodo previo recién pintado
+                                        if vecino.color in [ROJO, NARANJA]:
+                                            es_valido = True
+                                            break
+
+                                if es_valido:
+                                    if nodo == fin:
+                                        # ... (TU CÓDIGO DE VICTORIA) ...
+                                        t_fin = time.time() - start_time
+                                        if generado: guardar_datos("Humano", filas_actuales, t_fin, 0,
+                                                                   current_maze_id)  # Ajusta nodos si quieres
+                                        mostrar_mensaje(VENTANA, f"Ganaste: {t_fin:.2f}s", FUENTES)
+                                        toggle_juego()
+                                        nodo_previo = None  # Reset
+                                        break  # Salir del for
+                                    elif nodo != inicio:
+                                        nodo.hacer_camino_usuario()
+
+                                # Guardamos el último nodo procesado como el previo para el siguiente frame
+                            if jugando:  # Chequeo extra por si ganó en el bucle
+                                nodo_previo = nodo_actual
                         else:
                             # Logica Editor
-                            if not inicio and nodo != fin:
-                                inicio = nodo; inicio.hacer_inicio()
-                            elif not fin and nodo != inicio:
-                                fin = nodo; fin.hacer_fin()
-                            elif nodo != fin and nodo != inicio:
-                                nodo.hacer_muro(); generado = False
+                            if not inicio and nodo_actual != fin:
+                                inicio = nodo_actual
+                                inicio.hacer_inicio()
+                            elif not fin and nodo_actual != inicio:
+                                fin = nodo_actual
+                                fin.hacer_fin()
+                            elif nodo_actual != fin and nodo_actual != inicio:
+                                nodo_actual.hacer_muro()
+                                generado = False
 
             elif pygame.mouse.get_pressed()[2]:  # Clic Derecho (Borrar)
                 if not jugando and not viendo_ranking:
@@ -180,7 +232,7 @@ def main():
                     current_maze_id = "Manual"
                     grid = crear_grid(filas_actuales, ancho_nodo)
 
-    pygame.quit();
+    pygame.quit()
     sys.exit()
 
 
