@@ -20,6 +20,7 @@ VERDE_BOTON = (0, 200, 0)
 NARANJA = (255, 165, 0)
 TURQUESA = (64, 224, 208)
 AZUL = (0, 0, 255)
+AZUL_BOTON = (0 , 0 , 150)
 VERDE = (0, 255, 0)
 ROJO = (255, 0, 0)
 MORADO = (128, 0, 128)
@@ -29,7 +30,7 @@ AMARILLO = (255, 255, 0)
 def init_fuentes():
     return {
         'titulo': pygame.font.SysFont('arial', 30, bold=True),
-        'texto': pygame.font.SysFont('arial', 18),
+        'texto': pygame.font.SysFont('arial', 16),
         'boton': pygame.font.SysFont('arial', 20, bold=True),
         'modo': pygame.font.SysFont('arial', 30, bold=True),
         'exito': pygame.font.SysFont('arial', 40, bold=True)

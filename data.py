@@ -33,5 +33,9 @@ def obtener_ranking():
             for row in reader: datos.append(row)
 
         datos.sort(key=lambda x: (x[4], float(x[2])))
-        return datos[:12]  # Mostramos un poco más
+        return datos
     except:return []
+
+def borrar_datos_csv():
+    if os.path.exists(ARCHIVO):
+        os.remove(ARCHIVO)

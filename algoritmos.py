@@ -48,6 +48,7 @@ def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guar
             total_time = end_time - start_time
             reconstruir_camino(came_from, fin, draw)
             fin.hacer_fin()
+            inicio.hacer_inicio()
             if guardar:
                 # Pasamos los nuevos datos
                 guardar_datos(f"Algoritmo {tipo}", len(grid), total_time, nodos_visitados, maze_id)
