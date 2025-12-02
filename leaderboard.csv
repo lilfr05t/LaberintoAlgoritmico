@@ -1,13 +1,1 @@
 Jugador,Grid_Size,Tiempo (s),Fecha
-Humano,40x40,6.793,2025-12-01 15:52:04
-Algoritmo Dijkstra,40x40,0.958,2025-12-01 15:52:40
-Algoritmo Dijkstra,40x40,0.837,2025-12-01 15:57:54
-Algoritmo Dijkstra,60x60,2.820,2025-12-01 19:04:57
-Humano,40x40,1.369,2025-12-01 19:14:52
-Algoritmo Dijkstra,40x40,1.550,2025-12-01 21:13:49
-Humano,40x40,1.614,2025-12-01 21:29:45
-Humano,40x40,42.208,2025-12-01 21:31:30
-Algoritmo Dijkstra,40x40,1.439,2025-12-01 21:31:39
-Humano,40x40,74.502,2025-12-01 21:39:31
-Humano,30x30,12.732,2025-12-01 21:43:55
-Algoritmo Dijkstra,30x30,1.443,2025-12-01 21:44:02
