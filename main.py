@@ -142,12 +142,13 @@ def main():
     botones_main = [boton_tamano, boton_jugar, boton_ranking]
 
     btn_prev = Boton(ANCHO_MENU + 20, 550, 40, 40, "<", prev_page)
+    btn_prev.color = (30, 30, 40)
     btn_next = Boton(ANCHO_TOTAL - 60, 550, 40, 40, ">", next_page)
+    btn_next.color = (30, 30, 40)
     # Botón Borrar arriba a la derecha
     btn_borrar = Boton(ANCHO_TOTAL - 180, 20, 170, 30, "Borrar datos", pedir_borrar)
-
+    btn_borrar.color = (30, 30, 40)
     botones_nav = [btn_prev, btn_next, btn_borrar]
-
     cx, cy = ANCHO_TOTAL // 2, ALTO_VENTANA // 2
     btn_si = Boton(cx - 110, cy + 20, 100, 40, "SÍ", confirmar_borrado)
     btn_si.color = ROJO

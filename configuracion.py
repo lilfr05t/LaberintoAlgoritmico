@@ -29,7 +29,7 @@ AMARILLO = (255, 255, 0)
 # Fuentes (Se inicializan después de pygame.init en main, pero definimos nombres)
 def init_fuentes():
     return {
-        'titulo': pygame.font.SysFont('arial', 30, bold=True),
+        'titulo': pygame.font.SysFont('arial', 28, bold=True),
         'texto': pygame.font.SysFont('arial', 16),
         'boton': pygame.font.SysFont('arial', 20, bold=True),
         'modo': pygame.font.SysFont('arial', 30, bold=True),

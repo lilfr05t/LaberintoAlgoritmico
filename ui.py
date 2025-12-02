@@ -36,7 +36,7 @@ def dibujar_ventana_completa(win, grid, botones, modo_juego, fuentes, tiempo_act
 
     # Timer
     pygame.draw.rect(win, NEGRO, (20, 70, 160, 40), border_radius=5)
-    win.blit(fuentes['boton'].render(f"T: {tiempo_actual:.2f} s", True, ROJO), (35, 80))
+    win.blit(fuentes['boton'].render(f"T: {tiempo_actual:.2f} s", True, BLANCO), (35, 80))
 
     # Estado
     est = "MODO: JUEGO" if modo_juego else "MODO: EDITOR"

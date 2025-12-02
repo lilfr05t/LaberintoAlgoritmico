@@ -50,7 +50,6 @@ def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guar
             fin.hacer_fin()
             inicio.hacer_inicio()
             if guardar:
-                # Pasamos los nuevos datos
                 guardar_datos(f"Algoritmo {tipo}", len(grid), total_time, nodos_visitados, maze_id)
 
 
