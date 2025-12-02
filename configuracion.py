@@ -32,5 +32,5 @@ def init_fuentes():
         'texto': pygame.font.SysFont('arial', 18),
         'boton': pygame.font.SysFont('arial', 20, bold=True),
         'modo': pygame.font.SysFont('arial', 30, bold=True),
-        'exito': pygame.font.SysFont('arial', 60, bold=True)
+        'exito': pygame.font.SysFont('arial', 40, bold=True)
     }

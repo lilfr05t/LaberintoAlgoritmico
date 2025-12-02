@@ -3,6 +3,7 @@ import heapq
 import random
 import sys
 import time
+import uuid
 from ui import mostrar_mensaje
 from data import guardar_datos
 
@@ -18,8 +19,10 @@ def reconstruir_camino(came_from, actual, draw):
         draw()
 
 
-def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guardar=False):
+def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guardar=False, maze_id="Manual"):
     count = 0
+    nodos_visitados = 0
+
     open_set = []
     heapq.heappush(open_set, (0, count, inicio))
     came_from = {}
@@ -38,14 +41,19 @@ def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guar
 
         actual = heapq.heappop(open_set)[2]
         open_set_hash.remove(actual)
+        nodos_visitados += 1
 
         if actual == fin:
             end_time = time.time()
             total_time = end_time - start_time
             reconstruir_camino(came_from, fin, draw)
             fin.hacer_fin()
-            if guardar: guardar_datos(f"Algoritmo {tipo}", len(grid), total_time)
-            mostrar_mensaje(win, f"{tipo}: {total_time:.2f}s", fuentes)
+            if guardar:
+                # Pasamos los nuevos datos
+                guardar_datos(f"Algoritmo {tipo}", len(grid), total_time, nodos_visitados, maze_id)
+
+
+            mostrar_mensaje(win, f"{tipo}: {total_time:.2f}s | Nodos: {nodos_visitados}", fuentes)
             return True
 
         for vecino in actual.vecinos:
@@ -70,12 +78,11 @@ def algoritmo_base(tipo, draw, grid, inicio, fin, start_time, fuentes, win, guar
     return False
 
 
-def algoritmo_dijkstra(draw, grid, inicio, fin, start, fuentes, win, guardar):
-    return algoritmo_base("Dijkstra", draw, grid, inicio, fin, start, fuentes, win, guardar)
+def algoritmo_dijkstra(draw, grid, inicio, fin, start, fuentes, win, guardar, maze_id):
+    return algoritmo_base("Dijkstra", draw, grid, inicio, fin, start, fuentes, win, guardar, maze_id)
 
-
-def algoritmo_a_star(draw, grid, inicio, fin, start, fuentes, win, guardar):
-    return algoritmo_base("A*", draw, grid, inicio, fin, start, fuentes, win, guardar)
+def algoritmo_a_star(draw, grid, inicio, fin, start, fuentes, win, guardar, maze_id):
+    return algoritmo_base("A*", draw, grid, inicio, fin, start, fuentes, win, guardar, maze_id)
 
 
 def generar_laberinto(draw, grid, filas):
@@ -102,7 +109,7 @@ def generar_laberinto(draw, grid, filas):
             grid[(actual.fila + sig.fila) // 2][(actual.col + sig.col) // 2].reset()
             sig.reset()
             stack.append(sig)
-            # draw()
+            draw()
         else:
             stack.pop()
     draw()
@@ -117,4 +124,5 @@ def generar_laberinto(draw, grid, filas):
     fin = cand[random.randint(0, max(0, len(cand) // 10))][1]
     fin.hacer_fin()
     draw()
-    return inicio, fin
+    maze_id = str(uuid.uuid4())[:8]
+    return inicio, fin, maze_id

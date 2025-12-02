@@ -6,6 +6,7 @@ from modelos import Boton, crear_grid
 from ui import dibujar_ventana_completa, dibujar_tabla_ranking, mostrar_mensaje
 from data import obtener_ranking, guardar_datos
 from algoritmos import algoritmo_dijkstra, algoritmo_a_star, generar_laberinto
+from modelos import Nodo
 
 
 def get_pos_click(pos, filas, ancho):
@@ -31,6 +32,7 @@ def main():
     viendo_ranking = False
     ranking_data = []
     start_time = 0
+    current_maze_id = "Manual"
 
     def cambiar_tamano():
         nonlocal grid, inicio, fin, filas_actuales, ancho_nodo
@@ -111,7 +113,13 @@ def main():
                             if valido:
                                 if nodo == fin:
                                     t_fin = time.time() - start_time
-                                    if generado: guardar_datos("Humano", filas_actuales, t_fin)
+                                    nodos_recorridos = 0
+                                    for row in grid:
+                                        for n in row:
+
+                                            if n.color == ROJO:
+                                                nodos_recorridos += 1
+                                    if generado: guardar_datos("Humano", filas_actuales, t_fin, nodos_recorridos, current_maze_id)
                                     mostrar_mensaje(VENTANA, f"Ganaste: {t_fin:.2f}s", FUENTES)
                                     toggle_juego()
                                 elif not nodo.es_muro() and nodo != inicio:
@@ -125,6 +133,25 @@ def main():
                             elif nodo != fin and nodo != inicio:
                                 nodo.hacer_muro(); generado = False
 
+            elif pygame.mouse.get_pressed()[2]:  # Clic Derecho (Borrar)
+                if not jugando and not viendo_ranking:
+                    pos = pygame.mouse.get_pos()
+                    f, c = get_pos_click(pos, filas_actuales, ancho_nodo)
+
+                    # Verificar que el clic sea válido dentro del grid
+                    if 0 <= f < filas_actuales and 0 <= c < filas_actuales:
+                        nodo = grid[f][c]
+                        nodo.reset()  # Borrar (poner en blanco)
+
+                        # Si borramos inicio o fin, reseteamos las referencias
+                        if nodo == inicio:
+                            inicio = None
+                        elif nodo == fin:
+                            fin = None
+
+                        # Si modificamos manualmente, ya no es un laberinto generado
+                        generado = False
+
             if event.type == pygame.KEYDOWN and not jugando and not viendo_ranking:
                 if inicio and fin:
                     draw_func = lambda t=0: dibujar_ventana_completa(VENTANA, grid, botones, jugando, FUENTES, t)
@@ -132,22 +159,25 @@ def main():
                         for n in f: n.actualizar_vecinos(grid, filas_actuales)
 
                     if event.key == pygame.K_SPACE:
-                        algoritmo_dijkstra(draw_func, grid, inicio, fin, time.time(), FUENTES, VENTANA, generado)
+
+                        algoritmo_dijkstra(draw_func, grid, inicio, fin, time.time(), FUENTES, VENTANA, generado,
+                                           current_maze_id)
                     if event.key == pygame.K_a:
-                        algoritmo_a_star(draw_func, grid, inicio, fin, time.time(), FUENTES, VENTANA, generado)
+                        algoritmo_a_star(draw_func, grid, inicio, fin, time.time(), FUENTES, VENTANA, generado,
+                                         current_maze_id)
 
                 if event.key == pygame.K_g:
                     generado = True;
                     inicio = None;
                     fin = None
-                    inicio, fin = generar_laberinto(
-                        lambda: dibujar_ventana_completa(VENTANA, grid, botones, jugando, FUENTES), grid,
-                        filas_actuales)
+                    inicio, fin, current_maze_id = (generar_laberinto(
+                        lambda: dibujar_ventana_completa(VENTANA, grid, botones, jugando, FUENTES), grid, filas_actuales))
 
                 if event.key == pygame.K_c:
                     generado = False;
                     inicio = None;
                     fin = None
+                    current_maze_id = "Manual"
                     grid = crear_grid(filas_actuales, ancho_nodo)
 
     pygame.quit();

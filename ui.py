@@ -59,10 +59,10 @@ def dibujar_ventana_completa(win, grid, botones, modo_juego, fuentes, tiempo_act
 def dibujar_tabla_ranking(win, ranking, fuentes):
     rect = pygame.Rect(ANCHO_MENU, 0, ANCHO_GRID, ALTO_VENTANA)
     pygame.draw.rect(win, (30, 30, 40), rect)
-    win.blit(fuentes['exito'].render("TOP 10 TIEMPOS", True, BLANCO), (ANCHO_MENU + 50, 50))
+    win.blit(fuentes['exito'].render("TIEMPOS Y NODOS", True, BLANCO), (ANCHO_MENU + 50, 50))
 
-    encabezados = ["Rank", "Jugador", "Grid", "Tiempo"]
-    x_pos = [ANCHO_MENU + 40, ANCHO_MENU + 120, ANCHO_MENU + 350, ANCHO_MENU + 480]
+    encabezados = ["Jugador", "Nodos", "Tiempo", "ID"]
+    x_pos = [ANCHO_MENU + 20, ANCHO_MENU + 200, ANCHO_MENU + 300, ANCHO_MENU + 450]
     y = 150
     for i, t in enumerate(encabezados):
         win.blit(fuentes['boton'].render(t, True, TURQUESA), (x_pos[i], y))
@@ -71,11 +71,19 @@ def dibujar_tabla_ranking(win, ranking, fuentes):
     y += 50
 
     for i, fila in enumerate(ranking):
+        # fila = [Jugador, Grid, Tiempo, Nodos, Maze_ID, Fecha]
+
+        jugador_corto = fila[0].replace("Algoritmo ", "")  # Abreviar nombre
+        nodos = fila[3]
+        tiempo = f"{fila[2]}s"
+        maze_id = fila[4]
+
         col = VERDE if "Humano" in fila[0] else NARANJA
-        datos = [f"#{i + 1}", fila[0], fila[1], f"{fila[2]} s"]
-        colores = [BLANCO, col, BLANCO, BLANCO]
+
+        datos = [jugador_corto, nodos, tiempo, maze_id]
+        colores = [col, BLANCO, BLANCO, GRIS_CLARO]
 
         for j, val in enumerate(datos):
-            win.blit(fuentes['texto'].render(val, True, colores[j]), (x_pos[j], y))
-        y += 40
+            win.blit(fuentes['texto'].render(str(val), True, colores[j]), (x_pos[j], y))
+        y += 35
     pygame.display.update()
