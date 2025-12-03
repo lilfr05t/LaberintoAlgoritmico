@@ -113,3 +113,4 @@ def dibujar_tabla_ranking(win, page_data, pag_actual, total_pags, botones_nav, c
         # Botones Sí/No
         for b in botones_conf: b.dibujar(win, fuentes['boton'])
     pygame.display.update()
+
